@@ -20,8 +20,8 @@ void setup()
   Serial.begin(9600);
 
   pinMode(13, OUTPUT); // blinker
-  pinMode(8, OUTPUT);
-  pinMode(12, OUTPUT); // blinker
+  pinMode(8, OUTPUT);  // blinker right
+  pinMode(12, OUTPUT); // blinker left
   
   pinMode(11, INPUT); // blinker input channel
   pinMode(9, INPUT);  // light input channel
