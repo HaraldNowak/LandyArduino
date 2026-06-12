@@ -9,7 +9,9 @@ int selftest = 0 ;
 
 int normallight=0;
 int highperflight=0;
+int rooflight=0;
 int highperflightsharp=0;
+int rooflightsharp=0;
 
 int duration = 500 ;
 double simPulseLen = 1200.0 ;
@@ -19,7 +21,7 @@ void setup()
 {
   Serial.begin(9600);
 
-  pinMode(13, OUTPUT); // blinker
+  pinMode(13, OUTPUT); // roof light
   pinMode(8, OUTPUT);  // blinker right
   pinMode(12, OUTPUT); // blinker left
   
@@ -27,6 +29,7 @@ void setup()
   pinMode(9, INPUT);  // light input channel
   pinMode(6, INPUT);  // motor input channel
 
+  pinMode(7, OUTPUT);  // reverse light
   pinMode(2, OUTPUT); // frontlight
   pinMode(4,OUTPUT);// bumper light
   // Calculate duty cycle from pulse len.
@@ -49,17 +52,31 @@ void loop()
     if( highperflightsharp == 1 ) {
       highperflight = 1 ;
     }
+    if( rooflightsharp == 1 ) {
+      rooflight = 1 ;
+    }    
     normallight = 1 ;
   } else {
     if( normallight == 1 && highperflight == 0 ) {
       highperflightsharp = 1 ; 
     } else {
-      highperflight = 0 ;
-      normallight = 0 ;
-      highperflightsharp = 0 ;
+      if( normallight == 1 && highperflight == 1 && rooflight == 0 ) {
+        rooflightsharp = 1 ; 
+      } else {
+        highperflight = 0 ;
+        normallight = 0 ;
+        rooflight = 0 ;
+        highperflightsharp = 0 ;
+        rooflightsharp = 0 ;
+      }
     }
   }
 
+  if( motorPWM < 1500 ) {
+    digitalWrite(7, HIGH);
+  } else {
+    digitalWrite(7, LOW);
+  }
   if( motorPWM >= 1500 ) {
     if( motorPWM-lastmotorPWM < -10 ) {
       analogWrite( 10, 255 ); // brake light
@@ -86,6 +103,11 @@ void loop()
     digitalWrite(4, HIGH);
   } else {
     digitalWrite(4, LOW);
+  }
+  if( rooflight == 1 ) {
+    digitalWrite(13, HIGH);
+  } else {
+    digitalWrite(13, LOW);
   }
    
   if(blinkerPWM < 100 ) {
@@ -137,7 +159,7 @@ void loop()
   }
   
   if( blinker == 1 || blinker == 2 ) {
-    digitalWrite(13, HIGH);
+    //digitalWrite(13, HIGH);
     digitalWrite(8, HIGH);
     if(selftest) {
       analogWrite( 10, dutyCycle );
@@ -148,7 +170,7 @@ void loop()
   }  
   delay(duration); // Wait for 500 millisecond(s)
   if( blinker == 1 || blinker == 2 ) {
-    digitalWrite(13, LOW);
+    //digitalWrite(13, LOW);
     digitalWrite(8, LOW);
     if(selftest) {
       analogWrite( 10, 255 );
